@@ -9,6 +9,15 @@
 #wf-shell[hidden]{display:none} .wf-content{max-width:700px;margin:0 auto;min-height:100%;padding:24px 8px;display:flex;flex-direction:column;justify-content:center;gap:14px}
 .wf-brand{text-align:center;background:linear-gradient(155deg,#182c4d88,#151426aa);border:1px solid #526687;border-radius:24px;padding:28px 18px}.wf-eyebrow{color:#b9c9df;letter-spacing:.18em;font-size:11px}.wf-brand h1{font-size:clamp(37px,10vw,70px);letter-spacing:.055em;line-height:1.08;margin:16px 0;color:#f3c16d;text-shadow:0 5px 20px #0009}.wf-brand p{color:#d5dfed;line-height:1.5}
 .wf-btn{width:100%;min-height:51px;border-radius:13px;border:1px solid #a87b41;background:linear-gradient(125deg,#e0a85b,#f6d693);color:#1b2031;font-size:16px;font-weight:850}.wf-btn.alt{background:#243653;color:white;border-color:#566d91}.wf-btn:focus-visible{outline:3px solid #fff}.wf-card{background:#121d33eb;border:1px solid #4f6484;border-radius:15px;padding:18px}.wf-card h2{color:#f1c379;margin-top:0}.wf-muted{color:#b9c8df;line-height:1.55}.wf-foot{text-align:center;font-size:12px;color:#a4b1c8}.wf-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;max-height:50vh;overflow:auto}.wf-person{border:1px solid #596984;border-radius:10px;padding:9px;background:#22314e}.wf-person strong{display:block;font-size:13px}.wf-person small{display:block;font-size:11px;color:#bdcde3;margin-top:4px}.wf-list{line-height:1.65;padding-left:20px}.wf-setting{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:8px 0}.wf-setting input{width:22px;height:22px}.wf-actions{display:flex;gap:8px;flex-wrap:wrap}.wf-actions .wf-btn{flex:1}
+
+/* Wildframe Clash v0.5: touch-friendly card deployment */
+.hand .card.playable{touch-action:none;user-select:none;-webkit-user-select:none;cursor:grab}
+.hand .card.playable:active{cursor:grabbing}
+.lane.drag-valid{outline:3px solid #60e8aa!important;box-shadow:inset 0 0 22px #35d99e55}
+.lane.drag-invalid{outline:3px solid #ff6c85!important}
+#wf-drag-ghost{position:fixed;pointer-events:none;z-index:900;opacity:.9;transform:rotate(-5deg) scale(1.08);box-shadow:0 20px 30px #000a;width:108px;max-width:30vw}
+#wf-drag-hint{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);background:#162b43;color:#fff;border:1px solid #e5bb71;border-radius:999px;padding:9px 16px;font-size:12px;z-index:901;pointer-events:none;box-shadow:0 5px 25px #0008;white-space:nowrap}
+
 </style></head><body><div class="wrap"><header><div class="sub">A WILDFRAME STUDIOS PROTOTYPE</div><h1>WILDFRAME: CLASH</h1><div class="sub">THREE LOCATIONS · SIX ROUNDS · ONE VICTOR</div></header>
 <div id="runtime-help" style="padding:11px;border:1px solid #e0ae53;border-radius:10px;background:#3c2d19;margin:10px 0;font-size:13px">If the buttons do not work, this file is being shown in a preview that does not run games. Download the HTML file and open it in a full desktop browser, or use a hosted game link.</div><div class="hud"><span class="pill" id="round">ROUND 1 / 6</span><span class="pill" id="energy">⚡ ENERGY 1 / 1</span><span class="pill" id="wins">LOCATIONS 0 – 0</span></div>
 <div id="team" class="teamflag off">THE HOUND TACTIC · Assemble all four Hayes brothers.</div><div class="board" id="board"></div><div class="hand-head"><strong>YOUR HAND</strong><span id="remaining" class="sub"></span></div><div class="hand" id="hand"></div><div class="actions"><button class="primary" id="end">End Round →</button><button id="undo">Undo Play</button><button id="restart">New Game</button></div><div class="notice" id="notice">Select a card, then a location to play it.</div><div class="log" id="log" aria-live="polite">Wildframe: Clash begins. Win at least two locations after round six.</div><div class="rules">Tap any friendly deployed card to inspect and activate its ability. Cooldowns are counted in rounds and each character can activate at most once per round. Team effects trigger automatically when their required cards are on the board. Prototype rules: Each round you gain energy equal to the round number. Unspent energy does not carry forward. Select a card in your hand, then tap a location. Each location holds up to four cards per side. Cards have Cost (blue) and Power (gold). The opponent acts when you end the round. Tied locations count for neither player. Abilities and locations are prototype designs subject to change.</div></div>
@@ -104,4 +113,76 @@ function goMenu(){closeAbility();$('overlay').classList.remove('show');wfPage('h
 $('restart').textContent='Main Menu';$('restart').onclick=goMenu;
 $('runtime-help').style.display='none';
 start();wfPage('home');
+
+/* V0.5 pointer drag-and-drop: works with touch, mouse and stylus.
+   Tap selection is preserved for accessibility. */
+let wfDrag=null, wfIgnoreClickUntil=0;
+document.addEventListener('click',function(ev){
+ if(Date.now()<wfIgnoreClickUntil && ev.target.closest('#hand .card')){
+   ev.preventDefault();ev.stopImmediatePropagation();
+ }
+},true);
+function wfDragClear(){
+ document.getElementById('wf-drag-ghost')?.remove();
+ document.getElementById('wf-drag-hint')?.remove();
+ document.querySelectorAll('.lane.drag-valid,.lane.drag-invalid').forEach(el=>el.classList.remove('drag-valid','drag-invalid'));
+}
+function wfDragHover(x,y){
+ let lane=document.elementFromPoint(x,y)?.closest('.lane');
+ document.querySelectorAll('.lane.drag-valid,.lane.drag-invalid').forEach(el=>el.classList.remove('drag-valid','drag-invalid'));
+ if(lane && lane.parentElement?.id==='board'){
+   let index=Array.from(document.querySelectorAll('#board > .lane')).indexOf(lane);
+   let valid=index>=0 && state.player.lanes[index].length<4;
+   lane.classList.add(valid?'drag-valid':'drag-invalid');
+   return valid?index:-1;
+ }
+ return -1;
+}
+document.addEventListener('pointerdown',function(ev){
+ if(ev.button!==0 && ev.pointerType==='mouse')return;
+ if(document.getElementById('wf-shell')?.hidden===false)return;
+ let el=ev.target.closest('#hand .card.playable');
+ if(!el || !state || state.ended)return;
+ let index=Array.from(el.parentElement.children).indexOf(el);
+ let c=state.player.hand[index];
+ if(!c||c.cost>state.energy)return;
+ wfDrag={id:ev.pointerId,uid:c.uid,x:ev.clientX,y:ev.clientY,card:el,active:false,hover:-1};
+},true);
+document.addEventListener('pointermove',function(ev){
+ const d=wfDrag;if(!d||d.id!==ev.pointerId)return;
+ const dist=Math.hypot(ev.clientX-d.x,ev.clientY-d.y);
+ if(!d.active&&dist<9)return;
+ if(!d.active){
+   d.active=true;
+   const ghost=d.card.cloneNode(true);
+   ghost.id='wf-drag-ghost';
+   document.body.appendChild(ghost);
+   const hint=document.createElement('div');hint.id='wf-drag-hint';hint.textContent='Release over a location to deploy';document.body.appendChild(hint);
+ }
+ ev.preventDefault();
+ const ghost=document.getElementById('wf-drag-ghost');
+ if(ghost){ghost.style.left=(ev.clientX-54)+'px';ghost.style.top=(ev.clientY-55)+'px'}
+ d.hover=wfDragHover(ev.clientX,ev.clientY);
+},{passive:false});
+document.addEventListener('pointerup',function(ev){
+ const d=wfDrag;if(!d||d.id!==ev.pointerId)return;
+ wfDrag=null;
+ if(!d.active)return;
+ // Suppress the synthetic tap that browsers can dispatch after touch dragging.
+ wfIgnoreClickUntil=Date.now()+420;
+ const lane=d.hover;
+ wfDragClear();
+ if(lane<0){
+   selected=null;render();setNotice('Card returned to your hand. Drag it onto an available location.');
+   return;
+ }
+ const card=state.player.hand.find(c=>c.uid===d.uid);
+ if(!card){render();return}
+ selected=d.uid;
+ laneClick(lane);
+},{passive:true});
+document.addEventListener('pointercancel',function(ev){
+ if(wfDrag?.id===ev.pointerId){wfDrag=null;wfDragClear()}
+});
+
 </script></body></html>
