@@ -1,0 +1,274 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>WILDFRAME: CLASH</title>
+<style>
+:root{color-scheme:dark;--bg:#090d18;--panel:#151d30;--line:#34405b;--gold:#f6ba62;--blue:#71caff;--red:#ff7785;--muted:#afbdd2}*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 50% 0%,#243452,#090d18 65%);font:15px system-ui,-apple-system,sans-serif;color:#f6f8ff;min-height:100vh}.wrap{max-width:1050px;margin:auto;padding:16px 12px 32px}header{text-align:center;margin-bottom:12px}h1{font-size:clamp(26px,6vw,45px);letter-spacing:.13em;margin:5px;color:var(--gold)}.sub{font-size:12px;letter-spacing:.18em;color:var(--muted)}.hud{display:flex;justify-content:space-between;gap:8px;align-items:center;margin:12px 0;flex-wrap:wrap}.pill{background:var(--panel);border:1px solid var(--line);border-radius:30px;padding:8px 12px;font-weight:650}.board{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}.lane{border:1px solid #58627d;border-radius:15px;background:linear-gradient(#26334c,#121b2b);padding:9px;min-height:352px;display:flex;flex-direction:column;position:relative}.lane.choose{cursor:pointer;outline:2px solid var(--gold)}.lane h2{text-align:center;font-size:clamp(12px,2.6vw,18px);margin:4px 0}.effect{font-size:11px;text-align:center;color:#c3d2e6;min-height:43px}.side{font-size:11px;display:flex;justify-content:space-between;color:var(--muted);margin:5px 1px}.slot{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px;min-height:102px;align-content:start}.mid{margin:auto 0;text-align:center;font-size:12px;color:#9caccc;padding:10px 0}.score{font-weight:800;font-size:20px}.score.player{color:var(--blue)}.score.opp{color:var(--red)}.card{background:linear-gradient(140deg,#303b58,#172138);border:1px solid #687896;border-radius:9px;padding:7px 5px;min-height:82px;display:flex;flex-direction:column;justify-content:space-between;position:relative;text-align:left}.card.enemy{background:linear-gradient(140deg,#57313d,#2b1c2a);border-color:#a46c7a}.card b{font-size:clamp(10px,2.1vw,13px);line-height:1.12}.card .numbers{display:flex;justify-content:space-between;font-weight:800}.cost{color:#a2dfff}.power{color:#ffd48f}.card small{font-size:10px;line-height:1.2;color:#c9d3e5;margin-top:4px}.card.playable{cursor:pointer;box-shadow:0 0 0 1px #5d8fad}.card.selected{outline:3px solid var(--gold)}.card.disabled{opacity:.46}.hand-head{display:flex;justify-content:space-between;align-items:center;margin:18px 0 7px}.hand{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px}.hand .card{min-height:115px}.actions{display:flex;gap:8px;margin:12px 0;flex-wrap:wrap}button{font:inherit;border-radius:11px;border:1px solid #6a778e;background:#263851;color:#fff;padding:11px 15px;font-weight:700;cursor:pointer}button.primary{background:#ad7124;border-color:#ffc574;color:#fff}button:disabled{opacity:.4;cursor:not-allowed}.log{border:1px solid var(--line);border-radius:12px;background:#111b2a;padding:12px;margin-top:12px;min-height:65px;color:#d0d8e7;font-size:13px}.notice{margin-top:6px;color:var(--gold);font-weight:700}.rules{font-size:12px;color:var(--muted);line-height:1.5;margin-top:12px}#overlay,#ability-overlay{display:none;position:fixed;inset:0;background:#000b;align-items:center;justify-content:center;padding:18px;z-index:10}#overlay.show,#ability-overlay.show{display:flex}.modal{background:#1b2841;border:2px solid var(--gold);padding:26px;border-radius:20px;text-align:center;max-width:400px;width:100%}.modal h2{font-size:27px;color:var(--gold)}@media(min-width:750px){.slot{grid-template-columns:repeat(2,minmax(0,1fr))}.lane{min-height:405px}.card{min-height:92px}.hand{grid-template-columns:repeat(6,minmax(0,1fr))}}@media(max-width:390px){.wrap{padding:10px 6px}.board{gap:5px}.lane{padding:5px;min-height:340px}.card{padding:5px 3px}.card b{font-size:9px}.card small{font-size:9px}.effect{font-size:10px}}
+.card.deployed{cursor:pointer}.card.ready{border-color:#73e2bb;box-shadow:inset 0 0 0 1px #3bcfa0}.card.cooling{border-color:#55637d}.status{font-size:9px;color:#94e9c8;margin-top:3px}.card.cooling .status{color:#c5b8eb}.teamflag{margin:7px 0;padding:8px;background:#2a2537;border:1px solid #876baf;border-radius:9px;color:#eedaff;font-weight:700;font-size:12px}.lane.home{border-color:#ab85f7;background:linear-gradient(155deg,#39254e,#1a2137)}.lane.home.activated{background:radial-gradient(ellipse at top,#68467e,#171b2b 68%);border-color:#e5bf7e}.lane.home.activated:before{content:'🐺  🐺  🐺';position:absolute;left:0;right:0;top:41%;text-align:center;opacity:.11;font-size:22px;pointer-events:none}.modal .secondary{margin-top:8px;background:#243248}.abilitybox{text-align:left;line-height:1.5;margin:16px 0}.abilitybox strong{color:var(--gold)}.card .classlabel{color:#a4cbef;font-size:9px}.intro{font-size:12px;color:var(--muted);text-align:center;padding:6px}.info{font-size:11px;color:#b8d6ec}.teamflag.off{border-color:#3c5062;color:#acbace;background:#141e30}
+
+/* WILDFRAME CLASH 0.4: responsive navigation */
+#wf-shell{position:fixed;inset:0;overflow:auto;z-index:100;background:radial-gradient(circle at 50% 4%,#354c77,#111a30 48%,#090d18);padding:env(safe-area-inset-top) 12px env(safe-area-inset-bottom);color:#f6f8ff}
+#wf-shell[hidden]{display:none} .wf-content{max-width:700px;margin:0 auto;min-height:100%;padding:24px 8px;display:flex;flex-direction:column;justify-content:center;gap:14px}
+.wf-brand{text-align:center;background:linear-gradient(155deg,#182c4d88,#151426aa);border:1px solid #526687;border-radius:24px;padding:28px 18px}.wf-eyebrow{color:#b9c9df;letter-spacing:.18em;font-size:11px}.wf-brand h1{font-size:clamp(37px,10vw,70px);letter-spacing:.055em;line-height:1.08;margin:16px 0;color:#f3c16d;text-shadow:0 5px 20px #0009}.wf-brand p{color:#d5dfed;line-height:1.5}
+.wf-btn{width:100%;min-height:51px;border-radius:13px;border:1px solid #a87b41;background:linear-gradient(125deg,#e0a85b,#f6d693);color:#1b2031;font-size:16px;font-weight:850}.wf-btn.alt{background:#243653;color:white;border-color:#566d91}.wf-btn:focus-visible{outline:3px solid #fff}.wf-card{background:#121d33eb;border:1px solid #4f6484;border-radius:15px;padding:18px}.wf-card h2{color:#f1c379;margin-top:0}.wf-muted{color:#b9c8df;line-height:1.55}.wf-foot{text-align:center;font-size:12px;color:#a4b1c8}.wf-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;max-height:50vh;overflow:auto}.wf-person{border:1px solid #596984;border-radius:10px;padding:9px;background:#22314e}.wf-person strong{display:block;font-size:13px}.wf-person small{display:block;font-size:11px;color:#bdcde3;margin-top:4px}.wf-list{line-height:1.65;padding-left:20px}.wf-setting{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:8px 0}.wf-setting input{width:22px;height:22px}.wf-actions{display:flex;gap:8px;flex-wrap:wrap}.wf-actions .wf-btn{flex:1}
+
+/* Wildframe Clash v0.5: touch-friendly card deployment */
+.hand .card.playable{touch-action:none;user-select:none;-webkit-user-select:none;cursor:grab}
+.hand .card.playable:active{cursor:grabbing}
+.lane.drag-valid{outline:3px solid #60e8aa!important;box-shadow:inset 0 0 22px #35d99e55}
+.lane.drag-invalid{outline:3px solid #ff6c85!important}
+#wf-drag-ghost{position:fixed;pointer-events:none;z-index:900;opacity:.9;transform:rotate(-5deg) scale(1.08);box-shadow:0 20px 30px #000a;width:108px;max-width:30vw}
+#wf-drag-hint{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);background:#162b43;color:#fff;border:1px solid #e5bb71;border-radius:999px;padding:9px 16px;font-size:12px;z-index:901;pointer-events:none;box-shadow:0 5px 25px #0008;white-space:nowrap}
+
+</style></head><body><div class="wrap"><header><div class="sub">A WILDFRAME STUDIOS PROTOTYPE</div><h1>WILDFRAME: CLASH</h1><div class="sub">THREE LOCATIONS · SIX ROUNDS · ONE VICTOR</div></header>
+<div id="runtime-help" style="padding:11px;border:1px solid #e0ae53;border-radius:10px;background:#3c2d19;margin:10px 0;font-size:13px">If the buttons do not work, this file is being shown in a preview that does not run games. Download the HTML file and open it in a full desktop browser, or use a hosted game link.</div><div class="hud"><span class="pill" id="round">ROUND 1 / 6</span><span class="pill" id="energy">⚡ ENERGY 1 / 1</span><span class="pill" id="wins">LOCATIONS 0 – 0</span></div>
+<div id="team" class="teamflag off">THE HOUND TACTIC · Assemble all four Hayes brothers.</div><div class="board" id="board"></div><div class="hand-head"><strong>YOUR HAND</strong><span id="remaining" class="sub"></span></div><div class="hand" id="hand"></div><div class="actions"><button class="primary" id="end">End Round →</button><button id="undo">Undo Play</button><button id="restart">New Game</button></div><div class="notice" id="notice">Select a card, then a location to play it.</div><div class="log" id="log" aria-live="polite">Wildframe: Clash begins. Win at least two locations after round six.</div><div class="rules">Only featured characters have tap-to-activate abilities, each usable once per match. Most cards are standard cards. Two Eight Ninjas at one location gain +1 Power each; Harrow/Walter and Red Dot/Axis gain +2 Power each when together; two Wayward Crew members at one location gain +1 Power each. Team effects trigger automatically when their required cards are on the board. Prototype rules: Each round you gain energy equal to the round number. Unspent energy does not carry forward. Select a card in your hand, then tap a location. Each location holds up to four cards per side. Cards have Cost (blue) and Power (gold). The opponent acts when you end the round. Tied locations count for neither player. Abilities and locations are prototype designs subject to change.</div></div>
+<div id="overlay"><div class="modal"><h2 id="result"></h2><p id="result-details"></p><button class="primary" onclick="start()">Play Again</button><button onclick="goMenu()" style="margin-left:8px">Main Menu</button></div></div><div id="ability-overlay" class="showless" role="dialog" aria-modal="true" aria-label="Character ability"><div class="modal"><h2 id="ability-name"></h2><div class="abilitybox" id="ability-detail"></div><button class="primary" id="activate">Activate Ability</button><button class="secondary" id="cancel">Close</button></div></div>
+<script>
+// Wildframe: Clash v0.8 — expanded roster, challenge navigation, passive team synergies.
+const cardLibrary=[
+ ['blindside','Blindside',3,4,'Tactician','Night Shift','Hunter’s Mark',1,'Reduce the strongest enemy here by 2 Power.'],
+ ['gus','Gus Reyner',2,3,'Guardian','Night Shift','Defensive Stand',2,'Give every ally here +1 Power.'],
+ ['julian','Julian Cross',2,3,'Support','Night Shift','Investigation',1,'Give your weakest ally here +2 Power.'],
+ ['dean','Dean Hayes / Archetype',5,7,'Controller','Hayes Family','Sixth Sense',2,'Reduce the strongest enemy here by 3 Power.'],
+ ['weston','Weston Hayes / Viper',3,4,'Assassin','Hayes Family','Venom Strike',1,'Reduce an enemy here by 2 Power.'],
+ ['blake','Blake Hayes / Beast Slayer',4,6,'Bruiser','Hayes Family','Predator’s Rush',2,'Gain +3 Power if enemy total here exceeds yours. Otherwise gain +1.'],
+ ['ace','Ace Hayes / Vanguard',3,4,'Guardian','Hayes Family','Shield Wall',2,'Give every other friendly card here +2 Power.'],
+ ['kara','Kara Maddox',2,3,'Assassin','Independent','Precision Strike',2,'Reduce the strongest enemy here by 3 Power.'],
+ ['relay','Relay',3,4,'Tactician','Independent','Kinetic Discharge',2,'Gain +3 Power.'],
+ ['core','CORE',1,1,'Support','Independent','Tactical Override',2,'Give a friendly card here +3 Power.'],
+ ['wildcard','Wildcard',2,3,'Controller','Independent','House Rules',0,'Once per match: every enemy currently in play loses 2 Power permanently. Future enemies are unaffected.'],
+ ['afterimage','Afterimage',2,2,'Support','Independent','Echo Effect',0,'Once per match: deploy a 3-Power clone to each other location, if both have room.'],
+ ['whisper','Whisper',1,2,'Assassin','Eight Ninjas','Silent Strike',1,'Gain +2 Power if an enemy is here.'],
+ ['cutthroat','Cutthroat',4,6,'Assassin','Rogues','Double or Nothing',2,'A risky strike: 50% chance to gain +5 Power; otherwise lose 2 Power.'],
+ ['operative','Night Shift Operative',1,2,'Support','Night Shift','Cover Fire',1,'Give another ally at this location +1 Power.'],
+ ['fieldtech','Field Tech',1,1,'Support','Independent','Field Repair',1,'Give your lowest-Power ally here +1 Power.']
+].map(([id,name,cost,power,cardClass,faction,ability,cd,description])=>({id,name,cost,power,cardClass,faction,ability,cd,description}));
+// v0.6 beginner cards: original, game-only supporting operatives
+const rookieSupport=[
+ ['rookie_scout','Street Scout',1,2,'Tactician','Independent','Recon',1,'Gain +1 Power.'],
+ ['rookie_medic','Street Medic',1,1,'Support','Independent','First Aid',2,'Give your strongest ally here +2 Power.'],
+ ['rookie_runner','Courier',1,2,'Assassin','Independent','Momentum',1,'Gain +1 Power.'],
+ ['rookie_guard','Neighborhood Guard',2,3,'Guardian','Independent','Hold Position',2,'Gain +2 Power.'],
+ ['rookie_tech','Gadgeteer',2,2,'Support','Independent','Overclock',2,'Give an ally here +2 Power.'],
+ ['rookie_informant','Street Informant',2,3,'Tactician','Independent','Inside Tip',2,'Draw a card.'],
+ ['rookie_brawler','Backstreet Brawler',3,5,'Bruiser','Independent','Second Wind',2,'Gain +2 Power.'],
+ ['rookie_patrol','Community Patrol',3,4,'Guardian','Independent','Cover Allies',2,'Give allies here +1 Power.'],
+ ['rookie_heavy','Armored Volunteer',4,7,'Bruiser','Independent','Stand Firm',2,'Gain +2 Power.']
+].map(([id,name,cost,power,cardClass,faction,ability,cd,description])=>({id,name,cost,power,cardClass,faction,ability,cd,description}));
+cardLibrary.push(...rookieSupport);
+// Version 0.8: existing Wildframe canon characters, including the complete eight-ninja team.
+// Only specifically featured cards have manual abilities; the rest are straightforward deployable cards.
+const expansionRoster=[
+ ['mamba','Mamba',2,3,'Assassin','Eight Ninjas','Venomous Precision',0,'A silent serpent-themed ninja.'],
+ ['gold_dust','Gold Dust',3,5,'Bruiser','Eight Ninjas','All That Glitters',0,'Gold-armored ninja wielding golden energy.'],
+ ['azure','Azure',3,4,'Controller','Eight Ninjas','Tidal Control',0,'Blue-clad ninja of water and ice.'],
+ ['crimson','Crimson',4,7,'Bruiser','Eight Ninjas','Burning Resolve',0,'Red-armored ninja specializing in fire.'],
+ ['silk_petals','Silk Petals',2,3,'Assassin','Eight Ninjas','Petal Precision',0,'Pink-clad ninja with deadly precision.'],
+ ['jade_serpent','Jade Serpent',3,5,'Assassin','Eight Ninjas','Serpent Flow',0,'Green-clad ninja drawing on serpentine energy.'],
+ ['sand_veil','Sand Veil',2,4,'Tactician','Eight Ninjas','Vanishing Sands',0,'Sand-colored ninja specializing in concealment.'],
+ ['harrow','Harrow',4,6,'Assassin','Independent','Harrow and Walter',0,'Street-level Wildframe hero with a ferret companion named Walter.'],
+ ['walter','Walter',1,1,'Support','Companions','Ferret Companion',0,'Harrow’s ferret companion.'],
+ ['red_dot','Red Dot',3,4,'Tactician','Independent','Wolf Handler',0,'Levi, accompanied by the wolf Axis.'],
+ ['axis','Axis',2,3,'Guardian','Companions','Wolf Companion',0,'Red Dot / Levi’s trained wolf.'],
+ ['cass','Cass',3,4,'Tactician','Wayward Crew','Wayward Captain',0,'Member of the Wayward Crew.'],
+ ['rook','Rook',2,3,'Support','Wayward Crew','Wayward Mechanic',0,'Member of the Wayward Crew.'],
+ ['pip','Pip',1,2,'Support','Wayward Crew','Yeah!',0,'Small amphibian-like alien and Wayward Crew companion.'],
+ ['moxie','Moxie',2,3,'Tactician','Wayward Crew','Troublemaker',0,'Clever, feisty Wayward Crew creature.']
+].map(([id,name,cost,power,cardClass,faction,ability,cd,description])=>({id,name,cost,power,cardClass,faction,ability,cd,description}));
+cardLibrary.push(...expansionRoster);
+
+const starterIDs=['whisper','gus','julian','core','afterimage','relay','rookie_scout','rookie_medic','rookie_tech','rookie_informant','rookie_brawler','rookie_guard'];
+const signatureIDs=new Set(['wildcard','afterimage','dean','ace','relay','blindside','cutthroat']);
+const storageKey='wildframe-clash-progress-v06';
+function starterProgress(){return {credits:0,wins:0,losses:0,draws:0,unlocked:[...starterIDs],deck:[...starterIDs],firstVictory:false,matches:0,claimed:[],migratedBalanced:true}}
+function loadProgress(){try{const x=JSON.parse(localStorage.getItem(storageKey));if(!x||!Array.isArray(x.unlocked)||!Array.isArray(x.deck))return starterProgress();let valid=cardLibrary.map(c=>c.id);x.unlocked=[...new Set([...starterIDs,...x.unlocked.filter(id=>valid.includes(id))])];const oldStarter=['whisper','gus','julian',...rookieSupport.map(c=>c.id)];
+if(!x.migratedBalanced){x.unlocked=[...new Set([...x.unlocked,...starterIDs])];if(oldStarter.every(id=>x.deck.includes(id))&&x.deck.length===12)x.deck=[...starterIDs];x.migratedBalanced=true}
+x.deck=x.deck.filter(id=>x.unlocked.includes(id)).slice(0,12);return {...starterProgress(),...x}}catch(e){return starterProgress()}}
+let progress=loadProgress();
+const achievementRules=[
+ {id:'blindside',goal:3,name:'Night Shift Initiation',desc:'Win 3 Quick Battles'},
+ {id:'weston',goal:5,name:'The Viper',desc:'Win 5 Quick Battles'},
+ {id:'kara',goal:8,name:'Precision Operative',desc:'Complete 8 matches'},
+ {id:'dean',goal:12,name:'The Archetype',desc:'Complete 12 matches'}
+];
+function tryAwards(){
+ const earned=[];
+ achievementRules.forEach(a=>{if(progress.claimed.includes(a.id))return;let n=a.id==='blindside'||a.id==='weston'?progress.wins:progress.matches;if(n>=a.goal){progress.claimed.push(a.id);if(!progress.unlocked.includes(a.id)){progress.unlocked.push(a.id);earned.push(cardLibrary.find(c=>c.id===a.id).name)}}});
+ // Every 3 matches, award a random unowned character, never a duplicate.
+ if(progress.matches>0&&progress.matches%3===0){const opts=cardLibrary.filter(c=>!progress.unlocked.includes(c.id));if(opts.length){const card=opts[Math.floor(Math.random()*opts.length)];progress.unlocked.push(card.id);earned.push(card.name)}}
+ return earned;
+}
+function saveProgress(){try{localStorage.setItem(storageKey,JSON.stringify(progress))}catch(e){console.warn('Saving is not available in this browser',e)}}
+function unlockPrice(c){return c.faction==='Hayes Family'?400:c.id==='wildcard'||c.id==='relay'||c.id==='blindside'||c.id==='cutthroat'?350:200}
+function buyCard(id){const c=cardLibrary.find(c=>c.id===id);if(!c||progress.unlocked.includes(id)||progress.credits<unlockPrice(c))return;progress.credits-=unlockPrice(c);progress.unlocked.push(id);saveProgress();wfPage('collection')}
+function toggleDeck(id){if(!progress.unlocked.includes(id))return;let i=progress.deck.indexOf(id);if(i>=0){if(progress.deck.length<=1)return;progress.deck.splice(i,1)}else{if(progress.deck.length>=12)return;progress.deck.push(id)}saveProgress();wfPage('deck')}
+function rewardMatch(outcome){
+ if(state.rewarded)return;
+ state.rewarded=true;
+ let points=outcome==='VICTORY'?100:outcome==='DEFEAT'?40:60;
+ if(outcome==='VICTORY'){progress.wins++;if(!progress.firstVictory){progress.firstVictory=true;points+=150}}
+ else if(outcome==='DEFEAT')progress.losses++;else progress.draws++;
+ progress.credits+=points;progress.matches++;const awards=tryAwards();saveProgress();
+ const details=$('result-details');details.textContent+=' | +'+points+' Clash Credits (total '+progress.credits+')'+(awards.length?' | CARD UNLOCKED: '+awards.join(', '):'');
+}
+const foeLibrary=[
+ ['falcon1','Falcon Agent',1,2],['falcon2','Falcon Scout',1,2],['falcon3','Falcon Enforcer',2,4],['falcon4','Falcon Sniper',3,5],['falcon5','Falcon Handler',2,3],['falcon6','Falcon Hunter',4,7],['falcon7','Falcon Elite',5,9],['falcon8','Falcon Captain',6,11],['falcon9','Falcon Bruiser',3,5],['falcon10','Falcon Infiltrator',2,3],['falcon11','Falcon Specialist',4,6],['falcon12','Falcon Commander',5,8]
+].map(([id,name,cost,power])=>({id,name,cost,power,cardClass:'Falcon',faction:'Falcon Organization'}));
+const locations=[
+ {name:'Falcon Headquarters',desc:'First card played on each side here gains +2 Power.',type:'first'},
+ {name:'Hayes City',desc:'Hayes home territory. Full Hayes team unlocks HOME FIELD ADVANTAGE.',type:'home'},
+ {name:'Night Shift Warehouse',desc:'When your side has 3+ cards here, each gains +1 Power.',type:'crowd'}
+];
+const homeLocation={name:'Hayes City',desc:'Hayes home territory. Full Hayes team unlocks HOME FIELD ADVANTAGE.',type:'home'};
+const alternateLocation={name:'Old Market District',desc:'Cards costing 2 or less get +1 Power here.',type:'cheap'};
+const hayes=['dean','weston','blake','ace'];
+let state,selected=null,inspecting=null;
+const $=id=>document.getElementById(id);
+function shuffle(a){let v=[...a];for(let i=v.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[v[i],v[j]]=[v[j],v[i]]}return v}
+let nextUid=0;function cloneCard(c){return {...c,uid:'c'+(++nextUid),bonus:0,readyAt:1,lastUsed:0}}
+function start(){document.getElementById('runtime-help').style.display='none';locations[1]=Math.random()<.6?homeLocation:alternateLocation;state={round:1,energy:1,player:{deck:shuffle(progress.deck.map(id=>cardLibrary.find(c=>c.id===id)).filter(Boolean)).map(cloneCard),hand:[],lanes:[[],[],[]]},enemy:{deck:shuffle(foeLibrary).map(cloneCard),hand:[],lanes:[[],[],[]]},history:[],ended:false};selected=null;inspecting=null;$('overlay').classList.remove('show');$('ability-overlay').classList.remove('show');draw('player',5);draw('enemy',4);render();message('Select a card and a lane to deploy. Tap deployed allies for abilities.')}
+function draw(who,n=1){for(let i=0;i<n;i++){let p=state[who];if(p.deck.length)p.hand.push(p.deck.pop())}}
+function teamOn(){return hayes.every(id=>state.player.lanes.some(l=>l.some(c=>c.id===id)))}
+function homeOn(){return teamOn() && locations.some(l=>l.type==='home')}
+function value(c,loc,who){let a=state[who].lanes[loc],v=c.power+c.bonus;if(locations[loc].type==='crowd'&&a.length>=3)v+=1;if(locations[loc].type==='cheap'&&c.cost<=2)v+=1;if(who==='player'&&hayes.includes(c.id)&&teamOn())v+=homeOn()?3:2;
+ if(who==='player'){
+  // Team synergies only apply when partners are on the SAME location.
+  const ids=a.map(x=>x.id);
+  if(c.faction==='Eight Ninjas'&&a.filter(x=>x.faction==='Eight Ninjas').length>=2)v+=1;
+  if((c.id==='harrow'||c.id==='walter')&&ids.includes('harrow')&&ids.includes('walter'))v+=2;
+  if((c.id==='red_dot'||c.id==='axis')&&ids.includes('red_dot')&&ids.includes('axis'))v+=2;
+  if(c.faction==='Wayward Crew'&&a.filter(x=>x.faction==='Wayward Crew').length>=2)v+=1;
+ }
+ return v}
+function total(who,loc){return state[who].lanes[loc].reduce((s,c)=>s+value(c,loc,who),0)}
+function scores(){let p=0,e=0;for(let i=0;i<3;i++){if(total('player',i)>total('enemy',i))p++;else if(total('enemy',i)>total('player',i))e++}return [p,e]}
+function message(s){$('log').textContent=s}
+function setNotice(s){$('notice').textContent=s}
+function selectCard(uid){if(state.ended)return;const c=state.player.hand.find(x=>x.uid===uid);if(!c)return;if(c.cost>state.energy){setNotice('Not enough energy for '+c.name+'.');return}selected=selected===uid?null:uid;render();setNotice(selected?'Now tap a location for '+c.name+'.':'Select a card, then a location.')}
+function play(who,uid,loc){let p=state[who],idx=p.hand.findIndex(c=>c.uid===uid);if(idx<0||p.lanes[loc].length>=4)return false;let c=p.hand[idx];if(who==='player'&&c.cost>state.energy)return false;p.hand.splice(idx,1);let own=p.lanes[loc];if(locations[loc].type==='first'&&own.length===0)c.bonus+=2;own.push(c);if(who==='player')state.energy-=c.cost;return true}
+function laneClick(i){if(!selected||state.ended)return;let c=state.player.hand.find(x=>x.uid===selected);if(!c)return;if(state.player.lanes[i].length>=4){setNotice('Your side of this location is full.');return}state.history.push(JSON.stringify(state));play('player',selected,i);selected=null;render();setNotice('Deployed! Tap any friendly card on the board to use its ability.')}
+function undo(){if(!state.history.length||state.ended)return;state=JSON.parse(state.history.pop());selected=null;render();setNotice('Last action undone.')}
+function chooseEnemyMove(){let choices=[];for(let c of state.enemy.hand)for(let i=0;i<3;i++)if(state.enemy.lanes[i].length<4&&c.cost<=state.enemyEnergy){let advantage=total('player',i)-total('enemy',i),score=Math.min(7,Math.max(-4,advantage))*.7+c.power*.35+Math.random()*5;if(state.enemy.lanes[i].length===3)score-=2;choices.push({c,i,score})}choices.sort((a,b)=>b.score-a.score);return choices[0]}
+function endRound(){if(state.ended)return;state.history=[];state.enemyEnergy=state.round;let plays=[];for(let k=0;k<4;k++){let best=chooseEnemyMove();if(!best)break;state.enemyEnergy-=best.c.cost;play('enemy',best.c.uid,best.i);plays.push(best.c.name+' → '+locations[best.i].name)}if(state.round===6){state.ended=true;render();const [p,e]=scores(),title=p>e?'VICTORY':e>p?'DEFEAT':'DRAW';$('result').textContent=title;$('result-details').textContent=`You control ${p} location(s). Falcon controls ${e}.`;$('overlay').classList.add('show');rewardMatch(title);message('Final: '+(plays.join('; ')||'Falcon passes'));return}state.round++;state.energy=state.round;draw('player');draw('enemy');render();message('Falcon played: '+(plays.join('; ')||'no cards')+'.');setNotice('Round '+state.round+'. Tap any friendly deployed card to activate its ability.')}
+function safe(t){return String(t).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'",'&#39;')}
+function cardHTML(c,who,hand=false,loc=0){let avail=hand&&c.cost<=state.energy&&!state.ended;let special=signatureIDs.has(c.id);let ready=special&&!hand&&who==='player'&&state.round>=c.readyAt&&c.lastUsed!==state.round&&!state.ended;let classes=['card',who==='enemy'?'enemy':'',hand?(avail?'playable':'disabled'):'deployed',selected===c.uid?'selected':'',ready?'ready':'',!hand&&who==='player'&&!ready?'cooling':''].join(' ');let status=special&&!hand&&who==='player'?`<div class="status">${ready?'✦ TAP: READY':c.lastUsed===state.round?'USED THIS ROUND':`↻ READY R${c.readyAt}`}</div>`:'';return `<div class="${classes}" ${hand?`onclick="selectCard('${c.uid}')"`:(who==='player'&&special?`onclick="openAbility('${c.uid}')"`:'')} title="${safe(c.description||'')}"><div class="numbers"><span class="cost">${c.cost}⚡</span><span class="power">${hand?c.power:value(c,loc,who)}◆</span></div><b>${safe(c.name)}</b><span class="classlabel">${safe(c.cardClass)}</span>${hand?`<small>${special?safe(c.ability)+' · Once per match':'Standard card'}</small>`:status}</div>`}
+function openAbility(uid){if(state.ended)return;let found=null;for(let i=0;i<3;i++){let c=state.player.lanes[i].find(c=>c.uid===uid);if(c)found={c,loc:i}}if(!found||!signatureIDs.has(found.c.id))return;inspecting=found;const {c}=found;let ready=c.lastUsed===0;$('ability-name').textContent=c.name;$('ability-detail').innerHTML=`<strong>${safe(c.ability)}</strong><p>${safe(c.description)}</p><p><span class="info">${safe(c.cardClass)} · ${safe(c.faction)} · Signature ability · One use per match</span></p><p>${ready?'Ability ready.':'Already used in this match.'}</p>`;$('activate').disabled=!ready;$('ability-overlay').classList.add('show')}
+function closeAbility(){inspecting=null;$('ability-overlay').classList.remove('show')}
+function strongest(a,loc,who){return [...a].sort((x,y)=>value(y,loc,who)-value(x,loc,who))[0]}
+function weakest(a,loc,who){return [...a].sort((x,y)=>value(x,loc,who)-value(y,loc,who))[0]}
+function activate(){if(!inspecting||state.ended)return;let {c,loc}=inspecting,own=state.player.lanes[loc],enemy=state.enemy.lanes[loc];if(!own.includes(c)||c.lastUsed!==0)return;state.history.push(JSON.stringify(state));let target,info='';switch(c.id){
+case 'blindside':case 'weston':case 'dean':case 'kara':target=strongest(enemy,loc,'enemy');if(target){let penalty=({dean:3,kara:3,weston:2,blindside:2})[c.id];target.bonus-=penalty;info=`${target.name} loses ${penalty} Power.`}else info='No enemy here. Ability spent.';break;
+case 'gus':own.forEach(x=>x.bonus++);info='All allies here gain +1 Power.';break;
+case 'julian':target=weakest(own,loc,'player');target.bonus+=2;info=target.name+' gains +2 Power.';break;
+case 'blake':let b=total('enemy',loc)>total('player',loc)?3:1;c.bonus+=b;info=`Blake gains +${b} Power.`;break;
+case 'ace':own.filter(x=>x!==c).forEach(x=>x.bonus+=2);info='Other allies here gain +2 Power.';break;
+case 'relay':c.bonus+=3;info='Relay gains +3 Power.';break;
+case 'core':target=strongest(own.filter(x=>x!==c),loc,'player')||c;target.bonus+=3;info=target.name+' gains +3 Power.';break;
+case 'wildcard':{let n=0;state.enemy.lanes.forEach(l=>l.forEach(x=>{x.bonus-=2;n++}));info='House Rules: '+n+' enemy cards currently in play permanently lose 2 Power. Future enemies are unaffected.';break;}
+case 'afterimage':{const dest=[0,1,2].filter(i=>i!==loc);if(dest.some(i=>state.player.lanes[i].length>=4)){info='Cannot clone: one of the other locations is full.';state.history.pop();closeAbility();render();message(info);return;}dest.forEach(i=>state.player.lanes[i].push({...c,id:'afterimage_clone',name:'Afterimage Clone',cost:0,power:3,bonus:0,uid:'clone'+(++nextUid),lastUsed:-1,cd:0,readyAt:999,cardClass:'Clone',faction:'Independent',ability:'No ability',description:'3-Power copy.'}));info='Two 3-Power clones deployed to the other locations.';break;}
+case 'whisper':if(enemy.length){c.bonus+=2;info='Silent Strike: Whisper gains +2 Power.'}else info='No enemy to strike. Ability spent.';break;
+case 'cutthroat':b=Math.random()<.5?5:-2;c.bonus+=b;info='Cutthroat '+(b>0?'gains +5':'loses 2')+' Power.';break;
+case 'operative':target=own.find(x=>x!==c);if(target){target.bonus++;info=target.name+' gains +1 Power.'}else info='No ally to cover. Ability spent.';break;
+case 'fieldtech':target=weakest(own,loc,'player');target.bonus++;info=target.name+' gains +1 Power.';break;
+case 'rookie_medic':case 'rookie_tech':target=strongest(own.filter(x=>x!==c),loc,'player')||c;target.bonus+=2;info=target.name+' gains +2 Power.';break;
+case 'rookie_informant':if(state.player.deck.length){draw('player');info='Drew one card.'}else info='Deck empty.';break;
+case 'rookie_patrol':own.forEach(x=>{if(x!==c)x.bonus++});info='Other allies gain +1 Power.';break;
+case 'rookie_scout':case 'rookie_runner':c.bonus++;info=c.name+' gains +1 Power.';break;
+case 'rookie_guard':case 'rookie_brawler':case 'rookie_heavy':c.bonus+=2;info=c.name+' gains +2 Power.';break;
+}c.lastUsed=state.round;c.readyAt=999;closeAbility();render();message(c.name+' · '+c.ability+': '+info);setNotice('Ability activated. Tap another ready ally or end your round.')}
+function render(){$('round').textContent=`ROUND ${state.round} / 6`;$('energy').textContent=`⚡ ENERGY ${state.energy} / ${state.round}`;let [p,e]=scores();$('wins').textContent=`LOCATIONS ${p} – ${e}`;let team=teamOn();$('team').className='teamflag '+(team?'':'off');$('team').textContent=team?(homeOn()?'🐺 HOME FIELD ADVANTAGE · HOUND TACTIC · Hayes cards +3 Power':'🐺 THE HOUND TACTIC · All Hayes brothers +2 Power'):`THE HOUND TACTIC · ${hayes.filter(id=>state.player.lanes.some(l=>l.some(c=>c.id===id))).length}/4 Hayes brothers in play`; $('board').innerHTML=locations.map((l,i)=>`<section class="lane ${selected?'choose':''} ${l.type==='home'?'home':''} ${l.type==='home'&&homeOn()?'activated':''}" onclick="laneClick(${i})"><h2>${safe(l.name)}</h2><div class="effect">${safe(l.desc)}</div><div class="side"><span>FALCON</span><span class="score opp">${total('enemy',i)}</span></div><div class="slot">${state.enemy.lanes[i].map(c=>cardHTML(c,'enemy',false,i)).join('')}</div><div class="mid">${l.type==='home'&&homeOn()?'🐺 HOUND TERRITORY 🐺':'VS'}</div><div class="side"><span>YOU</span><span class="score player">${total('player',i)}</span></div><div class="slot">${state.player.lanes[i].map(c=>cardHTML(c,'player',false,i)).join('')}</div></section>`).join('');$('hand').innerHTML=state.player.hand.map(c=>cardHTML(c,'player',true)).join('')||'<span>No cards remaining.</span>';$('remaining').textContent=`${state.player.deck.length} cards in deck`;$('end').disabled=state.ended;$('undo').disabled=!state.history.length||state.ended}
+$('end').onclick=endRound;$('undo').onclick=undo;$('restart').onclick=start;$('activate').onclick=activate;$('cancel').onclick=closeAbility;$('ability-overlay').onclick=e=>{if(e.target.id==='ability-overlay')closeAbility()};
+// Version 0.4 user interface. Existing battle logic is preserved.
+const wfScreen=document.createElement('div');wfScreen.id='wf-shell';wfScreen.setAttribute('aria-label','Wildframe Clash main menu');document.body.appendChild(wfScreen);
+let wfSettings={tips:true,music:false,sound:false};
+function wfPage(page='home'){
+  const btn=(label,fn,other=false)=>'<button class="wf-btn '+(other?'alt':'')+'" onclick="'+fn+'">'+label+'</button>';
+  let content='';
+  if(page==='home')content='<section class="wf-brand"><div class="wf-eyebrow">WILDFRAME STUDIOS PRESENTS</div><div style="font-size:42px;margin-top:14px">⚔️ 🐺 🃏</div><h1>WILDFRAME:<br>CLASH</h1><p>Three locations. Six rounds. Endless strategy.</p></section>'+btn('START BATTLE',"wfPage('battle')")+btn('COLLECTION',"wfPage('collection')",true)+btn('DECK BUILDER',"wfPage('deck')",true)+btn('CHALLENGES',"wfPage('challenges')",true)+btn('REWARDS',"wfPage('rewards')",true)+btn('HOW TO PLAY',"wfPage('rules')",true)+btn('SETTINGS',"wfPage('settings')",true)+'<div class="wf-foot">Clash Credits: '+progress.credits+' · Prototype v0.8 · Wildframe Studios</div>';
+  if(page==='battle')content='<section class="wf-brand"><div class="wf-eyebrow">SELECT MODE</div><h1>QUICK<br>BATTLE</h1><p>Face an AI opponent across three locations. Win more locations at the end of six rounds.</p></section>'+btn('PLAY QUICK BATTLE','wfBegin()')+'<div class="wf-card wf-muted">Story Battle, Challenge Mode and multiplayer are planned for future updates.</div>'+btn('BACK',"wfPage('home')",true);
+  if(page==='collection')content='<section class="wf-card"><h2>COLLECTION</h2><p>Clash Credits: <b>'+progress.credits+'</b> · Unlocked: '+progress.unlocked.length+'/'+cardLibrary.length+' · Battles: '+progress.matches+'</p><p class="wf-muted">Win battles, claim milestones, and earn a guaranteed mystery card after every third completed match. You can also buy cards with credits. No duplicates.</p><div class="wf-grid">'+cardLibrary.map(c=>{let unlocked=progress.unlocked.includes(c.id);return '<div class="wf-person"><strong>'+(unlocked?'🔓 ':'🔒 ')+safe(c.name)+'</strong><small>'+safe(c.faction)+' · '+safe(c.cardClass)+'</small><small>⚡ '+c.cost+' · ◆ '+c.power+'</small><small>'+safe(c.ability)+' ('+c.cd+' round cooldown)</small>'+(unlocked?'<small>OWNED</small>':'<button '+(progress.credits<unlockPrice(c)?'disabled':'')+' onclick="buyCard(\''+c.id+'\')">Unlock · '+unlockPrice(c)+' credits</button>')+'</div>'}).join('')+'</div></section>'+btn('DECK BUILDER',"wfPage('deck')")+btn('BACK',"wfPage('home')",true);
+  if(page==='deck')content='<section class="wf-card"><h2>DECK BUILDER</h2><p>Selected: <b>'+progress.deck.length+'/12</b> cards</p><p class="wf-muted">A deck needs exactly 12 cards to begin a match. Tap owned cards to add or remove them.</p><div class="wf-grid">'+cardLibrary.filter(c=>progress.unlocked.includes(c.id)).map(c=>'<div class="wf-person"><strong>'+safe(c.name)+'</strong><small>'+safe(c.cardClass)+' · ⚡ '+c.cost+' ◆ '+c.power+'</small><button onclick="toggleDeck(\''+c.id+'\')">'+(progress.deck.includes(c.id)?'✓ In Deck · Remove':'Add to Deck')+'</button></div>').join('')+'</div></section>'+btn('BACK',"wfPage('home')",true);
+
+  if(page==='rewards')content='<section class="wf-card"><h2>CARD REWARDS</h2><p>Matches completed: '+progress.matches+' · Next guaranteed card after '+(3-progress.matches%3)+' more match(es).</p><p>Clash Credits: '+progress.credits+'</p>'+achievementRules.map(a=>'<div class="wf-person"><strong>'+a.name+'</strong><small>'+a.desc+'</small><small>'+((a.id==='blindside'||a.id==='weston')?progress.wins:progress.matches)+' / '+a.goal+'</small><small>'+(progress.claimed.includes(a.id)?'✓ Unlocked':'Not yet completed')+'</small></div>').join('')+'</section>'+btn('BACK',"wfPage('home')",true);
+  if(page==='challenges')content='<section class="wf-card"><h2>WILDFRAME CHALLENGES</h2><p class="wf-muted">Challenges award cards automatically when you complete Quick Battles. If you already own the card, you keep it. Your progress is saved.</p>'+achievementRules.map(a=>{let n=a.id==='blindside'||a.id==='weston'?progress.wins:progress.matches;return '<div class="wf-person"><strong>'+safe(a.name)+'</strong><small>'+safe(a.desc)+'</small><small>'+Math.min(n,a.goal)+' / '+a.goal+' · '+(progress.claimed.includes(a.id)?'✓ Completed':'In progress')+'</small></div>'}).join('')+'<div class="wf-person"><strong>🎁 Mystery Character</strong><small>Finish every 3 battles to earn one unowned card automatically.</small><small>Next reward in '+(3-progress.matches%3)+' battle(s).</small></div></section>'+btn('COLLECTION',"wfPage('collection')")+btn('BACK',"wfPage('home')",true);
+  if(page==='rules')content='<section class="wf-card"><h2>HOW TO PLAY</h2><ol class="wf-list"><li>Win more of the three locations than your opponent by the end of Round 6.</li><li>Each round, gain energy equal to the round number. Tap a card in your hand, then a location to deploy it.</li><li>Only certain featured characters have special abilities. Tap those cards once per match to activate them.</li><li>Play all four Hayes brothers to activate The Hound Tactic. If Hayes City is active, Home Field Advantage upgrades their bonus.</li><li>Press End Round to let the computer take its turn.</li></ol><p class="wf-muted">Tip: Each location can hold up to four cards per side.</p></section>'+btn('BACK',"wfPage('home')",true);
+  if(page==='settings')content='<section class="wf-card"><h2>SETTINGS</h2><label class="wf-setting"><span>Show ability tips</span><input type="checkbox" '+(wfSettings.tips?'checked':'')+' onchange="wfSettings.tips=this.checked;document.querySelector(\'.rules\').style.display=this.checked?\'\':\'none\'"></label><div class="wf-setting"><span>Music</span><small class="wf-muted">Coming soon</small></div><div class="wf-setting"><span>Sound effects</span><small class="wf-muted">Coming soon</small></div><div class="wf-setting"><span>Voice lines</span><small class="wf-muted">Coming soon</small></div></section>'+btn('BACK',"wfPage('home')",true);
+  wfScreen.innerHTML='<div class="wf-content">'+content+'</div>';wfScreen.hidden=false;window.scrollTo(0,0);
+}
+function wfBegin(){if(progress.deck.length!==12){wfPage('deck');alert('Build a 12-card deck before starting a battle.');return;}wfScreen.hidden=true;start();setNotice('Round 1 begins! Select a character from your hand, then tap a location.');window.scrollTo(0,0)}
+function goMenu(){closeAbility();$('overlay').classList.remove('show');wfPage('home')}
+$('restart').textContent='Main Menu';$('restart').onclick=goMenu;
+$('runtime-help').style.display='none';
+start();wfPage('home');
+
+/* V0.5 pointer drag-and-drop: works with touch, mouse and stylus.
+   Tap selection is preserved for accessibility. */
+let wfDrag=null, wfIgnoreClickUntil=0;
+document.addEventListener('click',function(ev){
+ if(Date.now()<wfIgnoreClickUntil && ev.target.closest('#hand .card')){
+   ev.preventDefault();ev.stopImmediatePropagation();
+ }
+},true);
+function wfDragClear(){
+ document.getElementById('wf-drag-ghost')?.remove();
+ document.getElementById('wf-drag-hint')?.remove();
+ document.querySelectorAll('.lane.drag-valid,.lane.drag-invalid').forEach(el=>el.classList.remove('drag-valid','drag-invalid'));
+}
+function wfDragHover(x,y){
+ let lane=document.elementFromPoint(x,y)?.closest('.lane');
+ document.querySelectorAll('.lane.drag-valid,.lane.drag-invalid').forEach(el=>el.classList.remove('drag-valid','drag-invalid'));
+ if(lane && lane.parentElement?.id==='board'){
+   let index=Array.from(document.querySelectorAll('#board > .lane')).indexOf(lane);
+   let valid=index>=0 && state.player.lanes[index].length<4;
+   lane.classList.add(valid?'drag-valid':'drag-invalid');
+   return valid?index:-1;
+ }
+ return -1;
+}
+document.addEventListener('pointerdown',function(ev){
+ if(ev.button!==0 && ev.pointerType==='mouse')return;
+ if(document.getElementById('wf-shell')?.hidden===false)return;
+ let el=ev.target.closest('#hand .card.playable');
+ if(!el || !state || state.ended)return;
+ let index=Array.from(el.parentElement.children).indexOf(el);
+ let c=state.player.hand[index];
+ if(!c||c.cost>state.energy)return;
+ wfDrag={id:ev.pointerId,uid:c.uid,x:ev.clientX,y:ev.clientY,card:el,active:false,hover:-1};
+},true);
+document.addEventListener('pointermove',function(ev){
+ const d=wfDrag;if(!d||d.id!==ev.pointerId)return;
+ const dist=Math.hypot(ev.clientX-d.x,ev.clientY-d.y);
+ if(!d.active&&dist<9)return;
+ if(!d.active){
+   d.active=true;
+   const ghost=d.card.cloneNode(true);
+   ghost.id='wf-drag-ghost';
+   document.body.appendChild(ghost);
+   const hint=document.createElement('div');hint.id='wf-drag-hint';hint.textContent='Release over a location to deploy';document.body.appendChild(hint);
+ }
+ ev.preventDefault();
+ const ghost=document.getElementById('wf-drag-ghost');
+ if(ghost){ghost.style.left=(ev.clientX-54)+'px';ghost.style.top=(ev.clientY-55)+'px'}
+ d.hover=wfDragHover(ev.clientX,ev.clientY);
+},{passive:false});
+document.addEventListener('pointerup',function(ev){
+ const d=wfDrag;if(!d||d.id!==ev.pointerId)return;
+ wfDrag=null;
+ if(!d.active)return;
+ // Suppress the synthetic tap that browsers can dispatch after touch dragging.
+ wfIgnoreClickUntil=Date.now()+420;
+ const lane=d.hover;
+ wfDragClear();
+ if(lane<0){
+   selected=null;render();setNotice('Card returned to your hand. Drag it onto an available location.');
+   return;
+ }
+ const card=state.player.hand.find(c=>c.uid===d.uid);
+ if(!card){render();return}
+ selected=d.uid;
+ laneClick(lane);
+},{passive:true});
+document.addEventListener('pointercancel',function(ev){
+ if(wfDrag?.id===ev.pointerId){wfDrag=null;wfDragClear()}
+});
+
+</script></body></html>
